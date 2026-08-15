@@ -1,0 +1,50 @@
+- heading "hello wordl" [level=1]
+- button "About": ❓
+- button "Settings": ⚙️
+- link "Today's":
+  - /url: "?seed=20260815"
+- text: "Letters:"
+- slider "Letters:" [disabled]: "5"
+- button "Give up"
+- table "Table of guesses":
+  - rowgroup:
+    - 'row "C: correct R: no A: no N: no E: no"':
+      - 'cell "C: correct"': c
+      - 'cell "R: no"': r
+      - 'cell "A: no"': a
+      - 'cell "N: no"': "n"
+      - 'cell "E: no"': e
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+- alert
+- text: playing a random game
+- paragraph:
+  - button "Share a link to this game"

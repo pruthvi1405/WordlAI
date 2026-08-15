@@ -1,0 +1,6 @@
+{"step": 1, "event": "guardrail_blocked", "ts": "2026-08-15T18:30:48.806621+00:00", "action": "click", "reason": "click target classified risky/irreversible \u2014 blocked, requires human escalation"}
+{"step": 2, "event": "escalation_requested", "ts": "2026-08-15T18:30:48.873841+00:00", "reason": "Automation attempted a risky/irreversible action ('Give up') that is blocked by policy; a human must decide how to proceed.", "capability_id": "submit_guess", "step_id": null, "url": "https://hellowordl.net/", "requested_at": "2026-08-15T18:30:48.873272+00:00"}
+{"step": 3, "event": "human_action", "ts": "2026-08-15T18:31:16.278509+00:00", "description": "type_text shard", "ok": true, "message": "typed 5 chars"}
+{"step": 4, "event": "human_action", "ts": "2026-08-15T18:31:16.286982+00:00", "description": "press_key Enter", "ok": true, "message": "pressed key 'Enter'"}
+{"step": 5, "event": "control_resumed_to_automation", "ts": "2026-08-15T18:31:33.992236+00:00", "human_action_count": 2}
+{"step": 6, "event": "automation_resumed", "ts": "2026-08-15T18:31:34.194437+00:00", "url": "https://hellowordl.net/"}

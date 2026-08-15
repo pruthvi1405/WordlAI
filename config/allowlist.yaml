@@ -1,0 +1,38 @@
+# Safety & policy guardrails (Section 3.4).
+# Every Surface.act() call is checked against this before it is allowed to execute.
+# This is a proxy-domain stand-in: in the real bank environment this file would be
+# per-tenant/per-app, generated from the capability's declared `target` block, and
+# reviewed the same way the capability artifact itself is reviewed.
+
+allowed_domains:
+  - hellowordl.net
+
+# Action types the agent/replay engine is permitted to issue at all.
+allowed_action_types:
+  - press_key
+  - type_text
+  - click
+  - wait
+  # navigate is intentionally NOT allowed by default — only the initial
+  # goal target navigation (performed once, outside the guarded action loop)
+  # is permitted. Mid-run navigation to a new URL is blocked.
+
+# Actions the agent/replay engine may take without confirmation because they are
+# safe and reversible in this domain: typing a guess, pressing keys, waiting.
+safe_action_types:
+  - press_key
+  - type_text
+  - wait
+
+# Click targets matching any of these accessible-name patterns are classified
+# risky/irreversible in this proxy domain (they discard in-progress state) and
+# must be blocked from unattended execution — escalate to a human instead.
+# This stands in for the real irreversible-action class in banking flows
+# (e.g. "Submit disbursement", "Close account", "Delete record").
+risky_click_names:
+  - "Give up"
+
+# Hard denylist: these domains must never be navigated to or acted on, even if
+# an LLM decides to, e.g. via a link on the page.
+denied_domains:
+  - "*"   # deny-by-default; only allowed_domains above are permitted

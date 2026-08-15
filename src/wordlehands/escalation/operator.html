@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>wordlehands — operator console (mocked)</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+  img { border: 1px solid #ccc; max-width: 100%; display: block; margin: 1rem 0; }
+  #state { font-family: monospace; background: #f4f4f4; padding: 0.5rem; }
+  button, input { font-size: 1rem; padding: 0.4rem 0.6rem; margin: 0.2rem; }
+  .warn { color: #a33; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>Operator console <span style="font-weight:normal">(intentionally bare — mocked per project scope)</span></h1>
+<p class="warn">This page acts directly on the SAME live automation session — it is not a fresh/simulated one.</p>
+<div id="state">loading...</div>
+<img id="shot" src="/screenshot" alt="live session screenshot" />
+<div>
+  <input id="letters" placeholder="letters e.g. crane" />
+  <button onclick="typeText()">Type</button>
+  <button onclick="pressKey('Enter')">Press Enter</button>
+  <button onclick="pressKey('Backspace')">Backspace</button>
+</div>
+<button onclick="resume()">Resume automation</button>
+
+<script>
+async function refresh() {
+  const s = await (await fetch('/state')).json();
+  document.getElementById('state').textContent =
+    `control_owner=${s.control_owner}  reason=${s.reason}  human_actions_taken=${s.human_action_count}`;
+  document.getElementById('shot').src = '/screenshot?ts=' + Date.now();
+}
+async function typeText() {
+  const letters = document.getElementById('letters').value;
+  await fetch('/act', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'type_text', text: letters }) });
+  refresh();
+}
+async function pressKey(k) {
+  await fetch('/act', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'press_key', key: k }) });
+  refresh();
+}
+async function resume() {
+  await fetch('/resume', { method: 'POST' });
+  refresh();
+}
+setInterval(refresh, 1500);
+refresh();
+</script>
+</body>
+</html>

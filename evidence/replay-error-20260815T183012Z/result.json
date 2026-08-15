@@ -1,0 +1,8 @@
+{
+  "status": "business_outcome",
+  "capability_id": "submit_guess",
+  "version": "1.0.0",
+  "code": "invalid_word",
+  "detail": "Not a valid word",
+  "outputs": {}
+}

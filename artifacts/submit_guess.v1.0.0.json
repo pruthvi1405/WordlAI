@@ -1,0 +1,225 @@
+{
+  "capability_id": "submit_guess",
+  "name": "Submit a Wordle guess and read tile feedback",
+  "version": "1.0.0",
+  "status": "draft",
+  "description": "Types a 5-letter guess into the current row of a hello-wordl-style game, submits it, and returns the per-letter correct/elsewhere/absent feedback plus updated game status. The atomic, reusable interaction underlying the game — strategy (which word to guess) is the caller's job, not this capability's.",
+  "target": {
+    "surface_type": "web",
+    "app_id": "hellowordl",
+    "base_url": "https://hellowordl.net/",
+    "allowed_domains": [
+      "hellowordl.net"
+    ]
+  },
+  "preconditions": [
+    "The target game is loaded and in an 'in_progress' state (not already won/lost/given up).",
+    "There is at least one empty guess row remaining."
+  ],
+  "inputs": [
+    {
+      "name": "guess",
+      "type": "string",
+      "description": "A 5-letter guess word (a-z, case-insensitive — typed as lowercase).",
+      "pattern": "^[A-Za-z]{5}$",
+      "required": true
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "type_guess",
+      "action": "type_text",
+      "description": "Type the 5-letter guess via physical key presses — mirrors exactly how the discovery agent did it (tool call #0); the on-screen keyboard buttons in this app are aria-hidden/decorative and are not used.",
+      "locator": null,
+      "input_param": "guess",
+      "literal_key": null,
+      "wait_ms": null
+    },
+    {
+      "step_id": "submit",
+      "action": "press_key",
+      "description": "Press Enter to submit the typed guess (tool call #1 in discovery).",
+      "locator": null,
+      "input_param": null,
+      "literal_key": "Enter",
+      "wait_ms": null
+    }
+  ],
+  "checkpoint": {
+    "description": "The submitted row's 5 tiles have all been evaluated: every cell's class carries a 'letter-' state suffix (letter-correct/letter-elsewhere/letter-absent). The base class 'Row-letter' alone is present on every cell even before evaluation, so checking for non-emptiness is not sufficient — this checks for the state-specific substring instead. If this never becomes true, the guess was not accepted (see error_taxonomy) or something unexpected happened.",
+    "locator": {
+      "strategy": "css",
+      "value": "table.Game-rows tr.Row:has(td.Row-letter:not(:empty)) >>> td.Row-letter",
+      "position": "last",
+      "fallbacks": [
+        {
+          "strategy": "css",
+          "value": "table.Game-rows tr.Row >>> td.Row-letter",
+          "position": "last",
+          "fallbacks": [],
+          "robustness_note": "Fallback: last row regardless of content, in case the :not(:empty) pseudo-class behaves unexpectedly. Less robust than the primary — kept only as a degrade path."
+        }
+      ],
+      "robustness_note": "Selects the most recently *filled* guess row by content — the row containing non-empty letter cells — rather than a hardcoded row index. This survives attempt-number drift entirely: it is correct whether this is guess 1 or guess 6, and correct whether the prior guess was accepted or rejected (rejected letters remain visible in the row). The failure mode this avoids is off-by-one row indexing, the most common way a naive recording breaks on replay."
+    },
+    "condition": "all_contain_substring",
+    "attribute": "class",
+    "match": "letter-",
+    "timeout_ms": 4000
+  },
+  "outputs": [
+    {
+      "name": "tile_results",
+      "type": "enum",
+      "description": "Per-letter result for the submitted guess, left to right.",
+      "locator": {
+        "strategy": "css",
+        "value": "table.Game-rows tr.Row:has(td.Row-letter:not(:empty)) >>> td.Row-letter",
+        "position": "last",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "table.Game-rows tr.Row >>> td.Row-letter",
+            "position": "last",
+            "fallbacks": [],
+            "robustness_note": "Fallback: last row regardless of content, in case the :not(:empty) pseudo-class behaves unexpectedly. Less robust than the primary — kept only as a degrade path."
+          }
+        ],
+        "robustness_note": "Selects the most recently *filled* guess row by content — the row containing non-empty letter cells — rather than a hardcoded row index. This survives attempt-number drift entirely: it is correct whether this is guess 1 or guess 6, and correct whether the prior guess was accepted or rejected (rejected letters remain visible in the row). The failure mode this avoids is off-by-one row indexing, the most common way a naive recording breaks on replay."
+      },
+      "attribute": "class",
+      "each": true,
+      "enum_values": [
+        "correct",
+        "elsewhere",
+        "absent"
+      ]
+    },
+    {
+      "name": "status_raw",
+      "type": "string",
+      "description": "Untouched text of the app's status/alert region after this guess, for debuggability.",
+      "locator": {
+        "strategy": "role",
+        "value": "role=alert",
+        "position": "first",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "[role='alert']",
+            "position": "first",
+            "fallbacks": [],
+            "robustness_note": "Direct CSS fallback if ARIA role querying fails for any reason."
+          }
+        ],
+        "robustness_note": "The app's own live-region status element — the same node screen readers announce from. This is a semantic commitment the developers already made for accessibility; it is far less likely to move than any CSS class name."
+      },
+      "attribute": "text",
+      "each": false,
+      "enum_values": null
+    },
+    {
+      "name": "game_status",
+      "type": "enum",
+      "description": "'won' = this guess won the game. 'answer was' = the game ended without winning (loss) and the answer was revealed. Any other raw value (status_raw) means the game is still in progress.",
+      "locator": {
+        "strategy": "role",
+        "value": "role=alert",
+        "position": "first",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "[role='alert']",
+            "position": "first",
+            "fallbacks": [],
+            "robustness_note": "Direct CSS fallback if ARIA role querying fails for any reason."
+          }
+        ],
+        "robustness_note": "The app's own live-region status element — the same node screen readers announce from. This is a semantic commitment the developers already made for accessibility; it is far less likely to move than any CSS class name."
+      },
+      "attribute": "text",
+      "each": false,
+      "enum_values": [
+        "won",
+        "answer was"
+      ]
+    }
+  ],
+  "error_taxonomy": [
+    {
+      "code": "invalid_word",
+      "category": "business_outcome",
+      "locator": {
+        "strategy": "role",
+        "value": "role=alert",
+        "position": "first",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "[role='alert']",
+            "position": "first",
+            "fallbacks": [],
+            "robustness_note": "Direct CSS fallback if ARIA role querying fails for any reason."
+          }
+        ],
+        "robustness_note": "The app's own live-region status element — the same node screen readers announce from. This is a semantic commitment the developers already made for accessibility; it is far less likely to move than any CSS class name."
+      },
+      "match_text": "Not a valid word",
+      "description": "The submitted guess is not a recognized dictionary word — a legitimate result the caller needs (pick a different word), not a crash."
+    },
+    {
+      "code": "invalid_length",
+      "category": "business_outcome",
+      "locator": {
+        "strategy": "role",
+        "value": "role=alert",
+        "position": "first",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "[role='alert']",
+            "position": "first",
+            "fallbacks": [],
+            "robustness_note": "Direct CSS fallback if ARIA role querying fails for any reason."
+          }
+        ],
+        "robustness_note": "The app's own live-region status element — the same node screen readers announce from. This is a semantic commitment the developers already made for accessibility; it is far less likely to move than any CSS class name."
+      },
+      "match_text": "must contain",
+      "description": "The submitted guess was not exactly the required number of letters."
+    },
+    {
+      "code": "game_already_over",
+      "category": "business_outcome",
+      "locator": {
+        "strategy": "role",
+        "value": "role=alert",
+        "position": "first",
+        "fallbacks": [
+          {
+            "strategy": "css",
+            "value": "[role='alert']",
+            "position": "first",
+            "fallbacks": [],
+            "robustness_note": "Direct CSS fallback if ARIA role querying fails for any reason."
+          }
+        ],
+        "robustness_note": "The app's own live-region status element — the same node screen readers announce from. This is a semantic commitment the developers already made for accessibility; it is far less likely to move than any CSS class name."
+      },
+      "match_text": "answer was",
+      "description": "The game had already ended (won, lost, or given up) before this call — no guess was submitted. Caller should stop invoking this capability."
+    }
+  ],
+  "risk": {
+    "level": "safe",
+    "requires_confirmation": false,
+    "rationale": "Submitting a guess is a normal, reversible game action with no destructive effect — safe for unattended automated replay. Contrast with 'Give up', which discards game state and is guardrail-blocked (see config/allowlist.yaml)."
+  },
+  "provenance": {
+    "created_at": "2026-08-15T18:29:26.981749+00:00",
+    "source": "llm_discovery",
+    "discovery_run_id": "discovery-20260815T182917Z",
+    "model_used": "gpt-4.1",
+    "reviewed_by": null
+  }
+}

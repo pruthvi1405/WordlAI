@@ -1,0 +1,16 @@
+{
+  "actions": [
+    {
+      "description": "type_text shard",
+      "ok": true,
+      "message": "typed 5 chars",
+      "ts": "2026-08-15T18:31:16.278509+00:00"
+    },
+    {
+      "description": "press_key Enter",
+      "ok": true,
+      "message": "pressed key 'Enter'",
+      "ts": "2026-08-15T18:31:16.286982+00:00"
+    }
+  ]
+}

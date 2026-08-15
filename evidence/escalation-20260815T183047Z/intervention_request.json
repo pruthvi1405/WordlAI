@@ -1,0 +1,7 @@
+{
+  "reason": "Automation attempted a risky/irreversible action ('Give up') that is blocked by policy; a human must decide how to proceed.",
+  "capability_id": "submit_guess",
+  "step_id": null,
+  "url": "https://hellowordl.net/",
+  "requested_at": "2026-08-15T18:30:48.873272+00:00"
+}

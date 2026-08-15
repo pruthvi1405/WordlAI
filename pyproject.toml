@@ -1,0 +1,32 @@
+[project]
+name = "wordlehands"
+version = "0.1.0"
+description = "Computer-use automation system: LLM discovery, deterministic replay, and human escalation, demonstrated against a live Wordle-clone surface."
+requires-python = ">=3.12"
+dependencies = [
+    "playwright>=1.47",
+    "openai>=1.50",
+    "pydantic>=2.9",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "python-dotenv>=1.0",
+    "click>=8.1",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+wordlehands = "wordlehands.cli:cli"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

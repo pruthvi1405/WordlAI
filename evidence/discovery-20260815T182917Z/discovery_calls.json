@@ -1,0 +1,52 @@
+{
+  "calls": [
+    {
+      "tool": "type_letters",
+      "args": {
+        "letters": "crane"
+      },
+      "ok": true,
+      "message": "typed 5 chars"
+    },
+    {
+      "tool": "press_key",
+      "args": {
+        "key": "Enter"
+      },
+      "ok": true,
+      "message": "pressed key 'Enter'"
+    },
+    {
+      "tool": "type_letters",
+      "args": {
+        "letters": "plush"
+      },
+      "ok": true,
+      "message": "typed 5 chars"
+    },
+    {
+      "tool": "press_key",
+      "args": {
+        "key": "Enter"
+      },
+      "ok": true,
+      "message": "pressed key 'Enter'"
+    },
+    {
+      "tool": "type_letters",
+      "args": {
+        "letters": "shush"
+      },
+      "ok": true,
+      "message": "typed 5 chars"
+    },
+    {
+      "tool": "press_key",
+      "args": {
+        "key": "Enter"
+      },
+      "ok": true,
+      "message": "pressed key 'Enter'"
+    }
+  ]
+}

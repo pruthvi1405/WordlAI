@@ -1,0 +1,10 @@
+{
+  "finished": true,
+  "finish_result": {
+    "outcome": "won",
+    "summary": "Guessed the word 'SHUSH' in 3 attempts by using letter feedback from previous guesses."
+  },
+  "escalated": false,
+  "escalate_reason": null,
+  "artifact_path": "/Users/pruthvi/Desktop/InterfaceAI/artifacts/submit_guess.v1.0.0.json"
+}
