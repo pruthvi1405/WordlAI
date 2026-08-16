@@ -99,7 +99,7 @@ class PlaywrightWebSurface(Surface):
                 if action.text is None:
                     return ActionOutcome(ok=False, message="type_text requires 'text'")
                 for ch in action.text:
-                    await self._page.keyboard.press(ch)
+                    await self._page.keyboard.press(ch, delay=60)
                 return ActionOutcome(ok=True, message=f"typed {len(action.text)} chars")
 
             if action.type == ActionType.CLICK:

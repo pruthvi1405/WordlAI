@@ -12,7 +12,7 @@ import time
 
 from openai import AsyncOpenAI
 
-from wordlehands.agent.tools import TOOL_DEFS, ToolRunner
+from wordlehands.agent.tools import TOOL_DEFS, OnCall, ToolRunner
 from wordlehands.config import settings
 from wordlehands.evidence.logger import EvidenceLogger
 from wordlehands.surface.base import Surface
@@ -21,7 +21,9 @@ SYSTEM_PROMPT = """You are operating a live web page for "hello wordl", a Wordle
 
 Rules: guess a 5-letter English word. After you submit a guess, each of its 5 letters is shown with a state: "correct" (right letter, right position), "elsewhere" (right letter, wrong position), or "no"/absent (letter not in the word). You have 6 attempts. Use the feedback from every prior guess to choose your next one — track it carefully, this is the actual skill in the game.
 
-How to submit a guess: call type_letters with exactly 5 lowercase letters, then call press_key with "Enter". Then call read_state (the screenshot you receive will also show the result) to see the outcome before deciding your next guess. If a guess is rejected as "not a valid word", it was not a real dictionary word — pick a different real English word next time; it does not use one of your 6 attempts.
+Before choosing a guess, call propose_next_words — it returns real dictionary words that are still consistent with every letter-state constraint learned from your guesses so far, ranked by how much they narrow the remaining possibilities. Picking from that list guarantees your guess will be accepted: type_letters will refuse (without touching the page) any word that isn't a real dictionary word or that contradicts feedback you've already seen.
+
+How to submit a guess: call type_letters with exactly 5 lowercase letters, then call press_key with "Enter". Then call read_state (the screenshot you receive will also show the result) to see the outcome before deciding your next guess.
 
 When the game has ended (you won, you lost, or you've reached a sensible stopping point), call finish_goal with the outcome. If you become genuinely stuck — repeated unexpected errors, an action you tried was blocked, or you cannot determine what to do next — call escalate instead of guessing randomly forever."""
 
@@ -37,6 +39,7 @@ async def run_discovery(
     evidence: EvidenceLogger,
     max_steps: int = 40,
     timeout_s: int = 600,
+    on_call: OnCall | None = None,
 ) -> ToolRunner:
     if not settings.openai_api_key:
         raise RuntimeError(
@@ -45,7 +48,7 @@ async def run_discovery(
         )
 
     client = AsyncOpenAI(api_key=settings.openai_api_key)
-    tool_runner = ToolRunner(surface, evidence)
+    tool_runner = ToolRunner(surface, evidence, on_call=on_call)
 
     obs = await surface.observe()
     evidence.save_screenshot_b64(obs.screenshot_b64, "step-00-initial.png")

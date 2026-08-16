@@ -62,8 +62,19 @@ async def _discover(goal, target_url, headless, max_steps):
     evidence = new_run(settings.evidence_dir, "discovery")
     guarded = _guarded(raw_surface, evidence)
 
+    step_count = 0
+
+    def _show_action(tool: str, args: dict, ok: bool, message: str) -> None:
+        nonlocal step_count
+        step_count += 1
+        status = "ok" if ok else "FAILED"
+        click.echo(f"  [{step_count:02d}] {tool}({json.dumps(args)}) -> {status}: {message}")
+
     try:
-        tool_runner = await run_discovery(goal, target_url, guarded, evidence, max_steps=max_steps)
+        click.echo(f"Discovery agent starting — goal: {goal}\n")
+        tool_runner = await run_discovery(
+            goal, target_url, guarded, evidence, max_steps=max_steps, on_call=_show_action
+        )
         evidence.write_json("discovery_calls.json", {"calls": tool_runner.calls})
 
         result = {
@@ -74,7 +85,7 @@ async def _discover(goal, target_url, headless, max_steps):
         }
 
         if tool_runner.finished:
-            click.echo(f"Discovery finished: {tool_runner.finish_result}")
+            click.echo(f"\nDiscovery finished: {tool_runner.finish_result}")
             try:
                 cap = distill_submit_guess_capability(
                     tool_runner.calls, evidence.run_dir.name, settings.openai_model, target_url

@@ -216,9 +216,9 @@
     "rationale": "Submitting a guess is a normal, reversible game action with no destructive effect — safe for unattended automated replay. Contrast with 'Give up', which discards game state and is guardrail-blocked (see config/allowlist.yaml)."
   },
   "provenance": {
-    "created_at": "2026-08-15T18:29:26.981749+00:00",
+    "created_at": "2026-08-16T01:54:45.584911+00:00",
     "source": "llm_discovery",
-    "discovery_run_id": "discovery-20260815T182917Z",
+    "discovery_run_id": "discovery-20260816T015214Z",
     "model_used": "gpt-4.1",
     "reviewed_by": null
   }
