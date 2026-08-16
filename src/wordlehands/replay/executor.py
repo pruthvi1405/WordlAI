@@ -5,12 +5,16 @@ return a structured ReplayResult.
 
 Error handling strategy: a step that fails is retried once (bounded — this is
 the "transient slowness" recoverable case), then hard-fails with full
-evidence. Once all steps have executed, the checkpoint is checked; if it does
-NOT hold, the executor checks the capability's error_taxonomy for a known
-explanation (e.g. "not a valid word") before concluding it's an
-undiagnosed hard failure. This ordering — steps, then checkpoint, then
-taxonomy-as-explanation-of-checkpoint-failure — is what keeps "no such
-member"-style business outcomes from ever surfacing as crashes.
+evidence. Once all steps have executed, the checkpoint and the error_taxonomy
+are polled together on every tick (`_poll_checkpoint_or_taxonomy`), not
+checkpoint-then-taxonomy-after-a-full-timeout: a business outcome like
+"not a valid word" has its own DOM signal (the alert region) that shows up
+almost immediately, so waiting out the checkpoint's full timeout before ever
+looking at the taxonomy would silently stall every rejection for no reason —
+this was a real, measured ~4s hang on every invalid-word replay before this
+was interleaved. A checkpoint that's just slow to evaluate (a genuine
+success, still animating) is unaffected: nothing in the taxonomy matches, so
+polling continues exactly as before until it resolves or the timeout expires.
 """
 
 from __future__ import annotations
@@ -102,42 +106,46 @@ class ReplayExecutor:
                         retry_outcome.message, retry_outcome.message,
                     )
 
-        checkpoint_ok, checkpoint_detail = await self._poll_checkpoint(capability.checkpoint)
+        checkpoint_ok, checkpoint_detail, entry, entry_detail = await self._poll_checkpoint_or_taxonomy(
+            capability
+        )
         self.evidence.log(
-            "checkpoint_checked", ok=checkpoint_ok, detail=checkpoint_detail
+            "checkpoint_checked",
+            ok=checkpoint_ok,
+            detail=checkpoint_detail,
+            taxonomy_matched=entry.code if entry else None,
         )
 
-        if not checkpoint_ok:
-            entry, detail = await self._match_taxonomy(capability)
-            if entry is not None:
-                self.evidence.log(
-                    "error_taxonomy_matched", code=entry.code, category=entry.category.value, detail=detail
-                )
-                if entry.category == OutcomeCategory.HARD_FAILURE:
-                    return await self._fail(capability, None, entry.description, detail, detail)
-                result = ReplayBusinessOutcome(
-                    capability_id=capability.capability_id,
-                    version=capability.version,
-                    code=entry.code,
-                    detail=detail,
-                )
-                self.evidence.write_result(result.model_dump())
-                return result
-
-            return await self._fail(
-                capability,
-                None,
-                capability.checkpoint.description,
-                checkpoint_detail,
-                "checkpoint not met and no known error_taxonomy entry explains why",
+        if checkpoint_ok:
+            outputs = await self._extract_outputs(capability.outputs)
+            success = ReplaySuccess(
+                capability_id=capability.capability_id, version=capability.version, outputs=outputs
             )
+            self.evidence.write_result(success.model_dump())
+            return success
 
-        outputs = await self._extract_outputs(capability.outputs)
-        result = ReplaySuccess(
-            capability_id=capability.capability_id, version=capability.version, outputs=outputs
+        if entry is not None:
+            self.evidence.log(
+                "error_taxonomy_matched", code=entry.code, category=entry.category.value, detail=entry_detail
+            )
+            if entry.category == OutcomeCategory.HARD_FAILURE:
+                return await self._fail(capability, None, entry.description, entry_detail, entry_detail)
+            business_outcome = ReplayBusinessOutcome(
+                capability_id=capability.capability_id,
+                version=capability.version,
+                code=entry.code,
+                detail=entry_detail,
+            )
+            self.evidence.write_result(business_outcome.model_dump())
+            return business_outcome
+
+        return await self._fail(
+            capability,
+            None,
+            capability.checkpoint.description,
+            checkpoint_detail,
+            "checkpoint not met and no known error_taxonomy entry explains why",
         )
-        self.evidence.write_result(result.model_dump())
-        return result
 
     def _validate_inputs(self, params: list[ParamSpec], inputs: dict) -> None:
         for p in params:
@@ -164,16 +172,30 @@ class ReplayExecutor:
             raise ValueError(f"unsupported step action {step.action}")
         return await self.surface.act(action)
 
-    async def _poll_checkpoint(self, checkpoint) -> tuple[bool, str]:
+    async def _poll_checkpoint_or_taxonomy(self, capability: Capability):
+        """Poll up to checkpoint.timeout_ms, checking BOTH the checkpoint
+        condition and the error_taxonomy on every tick, so a real business
+        outcome (its own DOM signal, e.g. an alert region) can resolve in
+        ~150ms instead of waiting out the full checkpoint timeout — the
+        checkpoint alone can't distinguish "still animating" from "never
+        going to happen".
+
+        Returns (checkpoint_ok, checkpoint_detail, taxonomy_entry_or_None,
+        taxonomy_detail).
+        """
+        checkpoint = capability.checkpoint
         deadline = time.monotonic() + checkpoint.timeout_ms / 1000
         last_detail = "never evaluated"
         while time.monotonic() < deadline:
             ok, detail = await self._check_checkpoint_once(checkpoint)
             last_detail = detail
             if ok:
-                return True, detail
+                return True, detail, None, ""
+            entry, entry_detail = await self._match_taxonomy(capability)
+            if entry is not None:
+                return False, detail, entry, entry_detail
             await asyncio.sleep(0.15)
-        return False, last_detail
+        return False, last_detail, None, ""
 
     async def _check_checkpoint_once(self, checkpoint) -> tuple[bool, str]:
         resolved = await self.surface.resolve(checkpoint.locator, attribute=checkpoint.attribute, each=True)

@@ -21,7 +21,7 @@ class Settings:
     headless: bool
 
     @classmethod
-    def load(cls) -> "Settings":
+    def load(cls) -> Settings:
         return cls(
             openai_api_key=os.environ.get("OPENAI_API_KEY"),
             openai_model=os.environ.get("WORDLEHANDS_MODEL", "gpt-4.1"),

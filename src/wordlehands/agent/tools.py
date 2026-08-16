@@ -22,7 +22,7 @@ from __future__ import annotations
 import asyncio
 import json
 import time
-from typing import Callable
+from collections.abc import Callable
 
 from wordlehands.agent import solver
 from wordlehands.evidence.logger import EvidenceLogger
@@ -260,6 +260,45 @@ class ToolRunner:
         obs = await self.surface.observe(include_screenshot=False)
         self.evidence.log("tool_call", tool="read_state", args=args)
         return json.dumps({"accessibility_snapshot": obs.accessibility_snapshot[:3000]})
+
+    async def resync_guess_history_from_board(self, max_rows: int = 6) -> None:
+        """Re-derive guess history directly from the live board rather than
+        trusting incremental tracking. Needed after a human operator has
+        acted on the session directly during an escalation handoff
+        (agent/loop.py) — those actions go straight through
+        EscalationManager/the operator server, bypassing this ToolRunner
+        entirely, so `_guess_history` would otherwise be silently stale
+        relative to the real board once control returns to the model.
+
+        Scans rows top-down and stops at the first row that isn't fully
+        evaluated (empty, mid-entry, or malformed) — rows fill in order, so
+        anything after that point is unplayed.
+        """
+        history: list[tuple[str, list[str]]] = []
+        for i in range(max_rows):
+            row_locator = LocatorSpec(
+                strategy=LocatorStrategy.CSS,
+                value="table.Game-rows tr.Row >>> td.Row-letter",
+                position=i,
+                robustness_note="Row i of the board, read by index rather than 'last filled'.",
+            )
+            letters = await self.surface.resolve(row_locator, attribute="text", each=True)
+            if not letters.found or len(letters.values) != 5:
+                break
+            classes = await self.surface.resolve(row_locator, attribute="class", each=True)
+            if not classes.found or len(classes.values) != 5:
+                break
+            states = [_classify_tile_class(c) for c in classes.values]
+            if any(s == "unknown" for s in states):
+                break
+            word = "".join(letters.values).strip().lower()
+            if len(word) != 5 or not word.isalpha():
+                break
+            history.append((word, states))
+
+        self._guess_history = history
+        self._pending_guess = None
+        self.evidence.log("guess_history_resynced", rows=len(history))
 
     async def _do_propose(self, args: dict) -> str:
         result = solver.propose(self._wordlist, self._guess_history)

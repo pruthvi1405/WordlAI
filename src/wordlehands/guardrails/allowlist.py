@@ -48,7 +48,7 @@ class AllowlistPolicy(BaseModel):
     denied_domains: list[str]
 
     @classmethod
-    def load(cls, path: Path) -> "AllowlistPolicy":
+    def load(cls, path: Path) -> AllowlistPolicy:
         data = yaml.safe_load(path.read_text())
         return cls(**data)
 

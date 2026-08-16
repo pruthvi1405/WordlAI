@@ -49,6 +49,8 @@ def build_app(manager: EscalationManager) -> FastAPI:
     @app.get("/screenshot")
     async def screenshot():
         obs = await manager.surface.observe(include_screenshot=True)
+        if not obs.screenshot_b64:
+            return Response(status_code=503, content=b"screenshot unavailable")
         png = base64.b64decode(obs.screenshot_b64)
         return Response(content=png, media_type="image/png")
 

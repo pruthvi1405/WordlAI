@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from wordlehands.agent.distiller import distill_submit_guess_capability
@@ -43,6 +45,22 @@ async def test_replay_invalid_word_is_business_outcome_not_a_crash(capability, e
 
     assert result.status == "business_outcome"
     assert result.code == "invalid_word"
+
+
+async def test_replay_invalid_word_resolves_fast_not_after_full_checkpoint_timeout(capability, evidence):
+    # capability.checkpoint.timeout_ms is 4000 — before the taxonomy check was
+    # interleaved into the poll loop, every rejection silently waited out the
+    # full 4s before falling through to the taxonomy match. It should now
+    # resolve on the first or second 150ms tick instead.
+    assert capability.checkpoint.timeout_ms == 4000
+    surface = FakeSurface(mode="invalid_word")
+
+    start = time.monotonic()
+    result = await ReplayExecutor(surface, evidence).run(capability, {"guess": "zzzzq"})
+    elapsed = time.monotonic() - start
+
+    assert result.status == "business_outcome"
+    assert elapsed < 1.0  # well under the 4s checkpoint timeout
 
 
 async def test_replay_precondition_short_circuits_when_game_already_over(capability, evidence):

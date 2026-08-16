@@ -1,5 +1,0 @@
-{"step": 1, "event": "replay_start", "ts": "2026-08-15T18:30:12.777507+00:00", "capability_id": "submit_guess", "version": "1.0.0", "inputs": {"guess": "zzzzq"}}
-{"step": 2, "event": "step_executed", "ts": "2026-08-15T18:30:12.830466+00:00", "step_id": "type_guess", "action": "type_text", "ok": true, "message": "typed 5 chars"}
-{"step": 3, "event": "step_executed", "ts": "2026-08-15T18:30:12.831663+00:00", "step_id": "submit", "action": "press_key", "ok": true, "message": "pressed key 'Enter'"}
-{"step": 4, "event": "checkpoint_checked", "ts": "2026-08-15T18:30:16.833176+00:00", "ok": false, "detail": "values=['Row-letter', 'Row-letter', 'Row-letter', 'Row-letter', 'Row-letter']"}
-{"step": 5, "event": "error_taxonomy_matched", "ts": "2026-08-15T18:30:16.838553+00:00", "code": "invalid_word", "category": "business_outcome", "detail": "Not a valid word"}

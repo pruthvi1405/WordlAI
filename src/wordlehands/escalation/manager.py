@@ -13,7 +13,7 @@ on that exact session. Every human action taken while `control_owner ==
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from wordlehands.evidence.logger import EvidenceLogger
 from wordlehands.surface.base import Surface
@@ -40,7 +40,7 @@ class EscalationManager:
             "capability_id": capability_id,
             "step_id": step_id,
             "url": obs.url,
-            "requested_at": datetime.now(timezone.utc).isoformat(),
+            "requested_at": datetime.now(UTC).isoformat(),
         }
         self.evidence.write_json("intervention_request.json", request)
         if obs.screenshot_b64:
@@ -54,7 +54,7 @@ class EscalationManager:
             "description": description,
             "ok": ok,
             "message": message,
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
         }
         self.human_actions.append(record)
         self.evidence.log("human_action", **record)

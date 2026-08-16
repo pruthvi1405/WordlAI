@@ -20,7 +20,7 @@ simple and JSON-serializable):
 from __future__ import annotations
 
 import base64
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from playwright.async_api import Locator, Page
 
@@ -84,7 +84,7 @@ class PlaywrightWebSurface(Surface):
             accessibility_snapshot=ax,
             dom_excerpt=dom,
             screenshot_b64=screenshot_b64,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     async def act(self, action: Action) -> ActionOutcome:
@@ -137,7 +137,7 @@ class PlaywrightWebSurface(Surface):
                 if result.found:
                     result.matched_strategy = spec.strategy
                     return result
-            except Exception as exc:  # noqa: BLE001
+            except Exception:  # noqa: BLE001
                 continue
         return ResolvedField(found=False, note="no strategy in the locator chain matched")
 
@@ -146,7 +146,15 @@ class PlaywrightWebSurface(Surface):
     ) -> ResolvedField:
         if spec.strategy == LocatorStrategy.ROLE:
             role, name = _parse_role_value(spec.value)
-            base = self._page.get_by_role(role, name=name) if name else self._page.get_by_role(role)
+            # Playwright's stub types the role param as a Literal of known ARIA
+            # roles; ours is free-form (LocatorSpec.value is unstructured data,
+            # by design — see this file's module docstring), and Playwright
+            # itself accepts any string at runtime.
+            base = (
+                self._page.get_by_role(role, name=name)  # type: ignore[arg-type]
+                if name
+                else self._page.get_by_role(role)  # type: ignore[arg-type]
+            )
             return await self._read(base, spec.position, attribute, each)
 
         if spec.strategy == LocatorStrategy.TEXT:
@@ -195,9 +203,9 @@ class PlaywrightWebSurface(Surface):
                 if s.strategy == LocatorStrategy.ROLE:
                     role, name = _parse_role_value(s.value)
                     base = (
-                        self._page.get_by_role(role, name=name)
+                        self._page.get_by_role(role, name=name)  # type: ignore[arg-type]
                         if name
-                        else self._page.get_by_role(role)
+                        else self._page.get_by_role(role)  # type: ignore[arg-type]
                     )
                 elif s.strategy == LocatorStrategy.TEXT:
                     base = self._page.get_by_text(s.value)

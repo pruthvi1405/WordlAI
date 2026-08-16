@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import click
+import uvicorn
 from playwright.async_api import async_playwright
 
 from wordlehands.agent.distiller import NoDiscoveredSubmission, distill_submit_guess_capability
@@ -48,13 +49,17 @@ def cli():
 @click.option("--target-url", default=None)
 @click.option("--headless/--headed", default=None)
 @click.option("--max-steps", default=40)
-def discover(goal: str, target_url: str | None, headless: bool | None, max_steps: int):
+@click.option("--port", default=8765, help="Operator console port, used only if the agent escalates.")
+def discover(goal: str, target_url: str | None, headless: bool | None, max_steps: int, port: int):
     """Run a real LLM-driven discovery loop against the live target, then
-    distill a successful run into a saved Capability artifact."""
-    asyncio.run(_discover(goal, target_url, headless, max_steps))
+    distill a successful run into a saved Capability artifact. If the agent
+    escalates, an operator console starts on `--port` so a human can take
+    control of the SAME session and hand it back — the loop then resumes
+    the model's own reasoning from the post-handoff state."""
+    asyncio.run(_discover(goal, target_url, headless, max_steps, port))
 
 
-async def _discover(goal, target_url, headless, max_steps):
+async def _discover(goal, target_url, headless, max_steps, port):
     target_url = target_url or settings.target_base_url
     headless = settings.headless if headless is None else headless
 
@@ -70,10 +75,33 @@ async def _discover(goal, target_url, headless, max_steps):
         status = "ok" if ok else "FAILED"
         click.echo(f"  [{step_count:02d}] {tool}({json.dumps(args)}) -> {status}: {message}")
 
+    def _show_escalation(reason: str, operator_url: str) -> None:
+        click.echo(f"\n  !! ESCALATED: {reason}")
+        click.echo(f"  Operator console: {operator_url} — take control, act, then POST /resume.")
+        click.echo("  Waiting for a human to resume...\n")
+
+    # Escalation manager + operator server are always wired up (cheap — the
+    # server just sits idle if the agent never escalates), so a real
+    # discovery run can hand off to a human mid-loop rather than only being
+    # demonstrable via the standalone `escalate-demo` command.
+    escalation_manager = EscalationManager(raw_surface, evidence)
+    operator_app = build_app(escalation_manager)
+    operator_config = uvicorn.Config(operator_app, host="127.0.0.1", port=port, log_level="warning")
+    operator_server = uvicorn.Server(operator_config)
+    operator_task = asyncio.create_task(operator_server.serve())
+
     try:
         click.echo(f"Discovery agent starting — goal: {goal}\n")
         tool_runner = await run_discovery(
-            goal, target_url, guarded, evidence, max_steps=max_steps, on_call=_show_action
+            goal,
+            target_url,
+            guarded,
+            evidence,
+            max_steps=max_steps,
+            on_call=_show_action,
+            escalation_manager=escalation_manager,
+            on_escalate=_show_escalation,
+            operator_url=f"http://127.0.0.1:{port}",
         )
         evidence.write_json("discovery_calls.json", {"calls": tool_runner.calls})
 
@@ -82,6 +110,7 @@ async def _discover(goal, target_url, headless, max_steps):
             "finish_result": tool_runner.finish_result,
             "escalated": tool_runner.escalated,
             "escalate_reason": tool_runner.escalate_reason,
+            "human_interventions": len(escalation_manager.human_actions),
         }
 
         if tool_runner.finished:
@@ -97,10 +126,12 @@ async def _discover(goal, target_url, headless, max_steps):
             except NoDiscoveredSubmission as exc:
                 click.echo(f"Could not distill a capability: {exc}")
         else:
-            click.echo(f"Discovery escalated: {tool_runner.escalate_reason}")
+            click.echo(f"Discovery stopped without finishing: {tool_runner.escalate_reason}")
 
         evidence.write_result(result)
     finally:
+        operator_server.should_exit = True
+        await operator_task
         await browser.close()
         await pw.stop()
 
@@ -171,10 +202,15 @@ async def _escalate_demo(target_url, headless, port):
         robustness_note="ARIA role+accessible name for the Give Up control.",
     )
     blocked = await guarded.act(
-        Action(type=ActionType.CLICK, locator=give_up_locator, reason="demo: agent decides it is stuck and wants to give up")
+        Action(
+            type=ActionType.CLICK,
+            locator=give_up_locator,
+            reason="demo: agent decides it is stuck and wants to give up",
+        )
     )
     click.echo(
-        f"Guarded action result: ok={blocked.ok} blocked_by_guardrail={blocked.blocked_by_guardrail} message={blocked.message}"
+        f"Guarded action result: ok={blocked.ok} "
+        f"blocked_by_guardrail={blocked.blocked_by_guardrail} message={blocked.message}"
     )
 
     manager = EscalationManager(raw_surface, evidence)

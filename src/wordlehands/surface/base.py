@@ -53,7 +53,7 @@ class LocatorSpec(BaseModel):
         )
     )
     position: Position = "first"
-    fallbacks: list["LocatorSpec"] = Field(default_factory=list)
+    fallbacks: list[LocatorSpec] = Field(default_factory=list)
     robustness_note: str = Field(
         description="Why this locator should survive real-world drift, and what would break it."
     )

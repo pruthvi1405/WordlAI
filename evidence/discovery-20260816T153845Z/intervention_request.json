@@ -1,0 +1,7 @@
+{
+  "reason": "dead end: reached max_steps=12 or timeout_s=600 without finishing",
+  "capability_id": "discovery",
+  "step_id": null,
+  "url": "https://hellowordl.net/",
+  "requested_at": "2026-08-16T15:46:34.184940+00:00"
+}

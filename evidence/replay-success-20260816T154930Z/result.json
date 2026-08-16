@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "capability_id": "submit_guess",
+  "version": "1.0.0",
+  "outputs": {
+    "tile_results": [
+      "elsewhere",
+      "elsewhere",
+      "absent",
+      "absent",
+      "elsewhere"
+    ],
+    "status_raw": "",
+    "game_status": ""
+  }
+}

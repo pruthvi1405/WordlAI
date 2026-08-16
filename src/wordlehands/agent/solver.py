@@ -98,7 +98,7 @@ def constraints_summary(history: list[tuple[str, list[Feedback]]]) -> dict:
     present: set[str] = set()
     ruled_out: set[str] = set()
     for guess, feedback in history:
-        for i, (letter, state) in enumerate(zip(guess, feedback)):
+        for i, (letter, state) in enumerate(zip(guess, feedback, strict=True)):
             if state == "correct":
                 locked[i] = letter
                 present.add(letter)

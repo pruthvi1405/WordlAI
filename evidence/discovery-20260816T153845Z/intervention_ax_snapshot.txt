@@ -1,0 +1,51 @@
+- heading "hello wordl" [level=1]
+- button "About": ❓
+- button "Settings": ⚙️
+- link "Today's":
+  - /url: "?seed=20260816"
+- text: "Letters:"
+- slider "Letters:": "5"
+- button "Give up" [disabled]
+- table "Table of guesses":
+  - rowgroup:
+    - 'row "A: no R: no O: elsewhere S: no E: no"':
+      - 'cell "A: no"': a
+      - 'cell "R: no"': r
+      - 'cell "O: elsewhere"': o
+      - 'cell "S: no"': s
+      - 'cell "E: no"': e
+    - 'row "S: no H: no I: elsewhere N: no E: no"':
+      - 'cell "S: no"': s
+      - 'cell "H: no"': h
+      - 'cell "I: elsewhere"': i
+      - 'cell "N: no"': "n"
+      - 'cell "E: no"': e
+    - 'row "L: no O: elsewhere G: no I: elsewhere C: no"':
+      - 'cell "L: no"': l
+      - 'cell "O: elsewhere"': o
+      - 'cell "G: no"': g
+      - 'cell "I: elsewhere"': i
+      - 'cell "C: no"': c
+    - 'row "B: no I: correct P: no O: elsewhere D: elsewhere"':
+      - 'cell "B: no"': b
+      - 'cell "I: correct"': i
+      - 'cell "P: no"': p
+      - 'cell "O: elsewhere"': o
+      - 'cell "D: elsewhere"': d
+    - 'row "D: correct I: correct T: correct T: correct O: correct"':
+      - 'cell "D: correct"': d
+      - 'cell "I: correct"': i
+      - 'cell "T: correct"': t
+      - 'cell "T: correct"': t
+      - 'cell "O: correct"': o
+    - row:
+      - cell
+      - cell
+      - cell
+      - cell
+      - cell
+- alert: You won! The answer was DITTO. (Enter to play again)
+- text: playing a random game
+- paragraph:
+  - button "Share a link to this game"
+  - button "Share emoji results"

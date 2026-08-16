@@ -6,7 +6,7 @@ own glossary, the most common design mistake in this space.
 
 from __future__ import annotations
 
-from typing import Literal, Union
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -46,4 +46,4 @@ class ReplayFailure(BaseModel):
     message: str
 
 
-ReplayResult = Union[ReplaySuccess, ReplayBusinessOutcome, ReplayFailure]
+ReplayResult = ReplaySuccess | ReplayBusinessOutcome | ReplayFailure

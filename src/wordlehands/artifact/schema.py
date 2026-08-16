@@ -14,7 +14,7 @@ deterministic mechanics, real data back.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Literal
 
@@ -136,7 +136,7 @@ class TargetSpec(BaseModel):
 
 
 class Provenance(BaseModel):
-    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     source: Literal["llm_discovery", "hand_authored"]
     discovery_run_id: str | None = None
     model_used: str | None = None

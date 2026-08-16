@@ -16,6 +16,11 @@ from wordlehands.surface.base import (
     Surface,
 )
 
+# A real (tiny, 1x1) PNG rather than None — run_discovery (agent/loop.py)
+# writes every observation's screenshot to evidence unconditionally, same as
+# the real PlaywrightWebSurface always provides one.
+_TINY_PNG_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+
 ALERT_TEXT = {
     "success": "",
     "invalid_word": "Not a valid word",
@@ -42,7 +47,7 @@ class FakeSurface(Surface):
             url=self.url,
             accessibility_snapshot="fake ax snapshot",
             dom_excerpt="<div>fake</div>",
-            screenshot_b64=None,
+            screenshot_b64=_TINY_PNG_B64 if include_screenshot else None,
             timestamp="2026-01-01T00:00:00Z",
         )
 

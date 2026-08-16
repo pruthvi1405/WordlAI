@@ -1,0 +1,4 @@
+{"step": 1, "event": "replay_start", "ts": "2026-08-16T15:49:30.995266+00:00", "capability_id": "submit_guess", "version": "1.0.0", "inputs": {"guess": "crane"}}
+{"step": 2, "event": "step_executed", "ts": "2026-08-16T15:49:31.359005+00:00", "step_id": "type_guess", "action": "type_text", "ok": true, "message": "typed 5 chars"}
+{"step": 3, "event": "step_executed", "ts": "2026-08-16T15:49:31.363402+00:00", "step_id": "submit", "action": "press_key", "ok": true, "message": "pressed key 'Enter'"}
+{"step": 4, "event": "checkpoint_checked", "ts": "2026-08-16T15:49:31.379598+00:00", "ok": true, "detail": "values=['Row-letter letter-elsewhere', 'Row-letter letter-elsewhere', 'Row-letter letter-absent', 'Row-letter letter-absent', 'Row-letter letter-elsewhere']", "taxonomy_matched": null}

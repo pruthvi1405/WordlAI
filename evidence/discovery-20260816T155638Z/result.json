@@ -1,0 +1,11 @@
+{
+  "finished": true,
+  "finish_result": {
+    "outcome": "won",
+    "summary": "I won the game in 4 guesses. The answer was ROCKY."
+  },
+  "escalated": false,
+  "escalate_reason": null,
+  "human_interventions": 0,
+  "artifact_path": "/Users/pruthvi/Desktop/InterfaceAI/artifacts/submit_guess.v1.0.0.json"
+}

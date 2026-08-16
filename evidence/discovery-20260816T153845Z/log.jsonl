@@ -1,0 +1,59 @@
+{"step": 1, "event": "discovery_start", "ts": "2026-08-16T15:38:45.905410+00:00", "goal": "Play hello wordl (a Wordle-style game) and win by guessing the 5-letter target word within 6 attempts.", "target_url": "https://hellowordl.net/", "model": "gpt-4.1"}
+{"step": 1, "event": "llm_turn", "ts": "2026-08-16T15:38:48.914263+00:00", "content": null, "tool_calls": ["propose_next_words"]}
+{"step": 3, "event": "tool_call", "ts": "2026-08-16T15:38:48.932920+00:00", "tool": "propose_next_words", "args": {}, "ok": true, "message": "8506 candidates remain"}
+{"step": 2, "event": "llm_turn", "ts": "2026-08-16T15:38:50.467536+00:00", "content": null, "tool_calls": ["type_letters"]}
+{"step": 5, "event": "tool_call", "ts": "2026-08-16T15:38:50.827111+00:00", "tool": "type_letters", "args": {"letters": "arose"}, "ok": true, "message": "typed 5 chars"}
+{"step": 3, "event": "llm_turn", "ts": "2026-08-16T15:38:53.178974+00:00", "content": null, "tool_calls": ["press_key"]}
+{"step": 7, "event": "tool_call", "ts": "2026-08-16T15:38:53.187027+00:00", "tool": "press_key", "args": {"key": "Enter"}, "ok": true, "message": "pressed key 'Enter'"}
+{"step": 8, "event": "guess_feedback_captured", "ts": "2026-08-16T15:38:53.202328+00:00", "guess": "arose", "feedback": ["absent", "absent", "elsewhere", "absent", "absent"]}
+{"step": 9, "event": "dead_end", "ts": "2026-08-16T15:38:53.218595+00:00", "reason": "dead end: reached max_steps=3 or timeout_s=600 without finishing"}
+{"step": 10, "event": "escalation_requested", "ts": "2026-08-16T15:38:53.251295+00:00", "reason": "dead end: reached max_steps=3 or timeout_s=600 without finishing", "capability_id": "discovery", "step_id": null, "url": "https://hellowordl.net/", "requested_at": "2026-08-16T15:38:53.250804+00:00"}
+{"step": 11, "event": "waiting_for_human_resume", "ts": "2026-08-16T15:38:53.251393+00:00"}
+{"step": 12, "event": "human_action", "ts": "2026-08-16T15:39:02.133388+00:00", "description": "type_text shine", "ok": true, "message": "typed 5 chars"}
+{"step": 13, "event": "human_action", "ts": "2026-08-16T15:39:02.150334+00:00", "description": "press_key Enter", "ok": true, "message": "pressed key 'Enter'"}
+{"step": 14, "event": "control_resumed_to_automation", "ts": "2026-08-16T15:39:02.157821+00:00", "human_action_count": 2}
+{"step": 15, "event": "human_resumed", "ts": "2026-08-16T15:39:02.158313+00:00", "human_action_count": 2}
+{"step": 16, "event": "guess_history_resynced", "ts": "2026-08-16T15:39:02.181252+00:00", "rows": 2}
+{"step": 4, "event": "llm_turn", "ts": "2026-08-16T15:39:05.502103+00:00", "content": null, "tool_calls": ["propose_next_words"]}
+{"step": 18, "event": "tool_call", "ts": "2026-08-16T15:39:05.521965+00:00", "tool": "propose_next_words", "args": {}, "ok": true, "message": "51 candidates remain"}
+{"step": 5, "event": "llm_turn", "ts": "2026-08-16T15:39:08.748577+00:00", "content": null, "tool_calls": ["type_letters"]}
+{"step": 20, "event": "tool_call", "ts": "2026-08-16T15:39:09.070995+00:00", "tool": "type_letters", "args": {"letters": "logic"}, "ok": true, "message": "typed 5 chars"}
+{"step": 6, "event": "llm_turn", "ts": "2026-08-16T15:39:12.209090+00:00", "content": null, "tool_calls": ["press_key"]}
+{"step": 22, "event": "tool_call", "ts": "2026-08-16T15:39:12.213378+00:00", "tool": "press_key", "args": {"key": "Enter"}, "ok": true, "message": "pressed key 'Enter'"}
+{"step": 23, "event": "guess_feedback_captured", "ts": "2026-08-16T15:39:12.224760+00:00", "guess": "logic", "feedback": ["absent", "elsewhere", "absent", "elsewhere", "absent"]}
+{"step": 24, "event": "dead_end", "ts": "2026-08-16T15:39:12.252791+00:00", "reason": "dead end: reached max_steps=6 or timeout_s=600 without finishing"}
+{"step": 25, "event": "escalation_requested", "ts": "2026-08-16T15:39:12.285941+00:00", "reason": "dead end: reached max_steps=6 or timeout_s=600 without finishing", "capability_id": "discovery", "step_id": null, "url": "https://hellowordl.net/", "requested_at": "2026-08-16T15:39:12.285483+00:00"}
+{"step": 26, "event": "waiting_for_human_resume", "ts": "2026-08-16T15:39:12.286046+00:00"}
+{"step": 27, "event": "control_resumed_to_automation", "ts": "2026-08-16T15:42:17.100248+00:00", "human_action_count": 2}
+{"step": 28, "event": "human_resumed", "ts": "2026-08-16T15:42:17.101062+00:00", "human_action_count": 2}
+{"step": 29, "event": "guess_history_resynced", "ts": "2026-08-16T15:42:17.133083+00:00", "rows": 3}
+{"step": 7, "event": "llm_turn", "ts": "2026-08-16T15:42:22.407959+00:00", "content": null, "tool_calls": ["propose_next_words"]}
+{"step": 31, "event": "tool_call", "ts": "2026-08-16T15:42:22.429237+00:00", "tool": "propose_next_words", "args": {}, "ok": true, "message": "8 candidates remain"}
+{"step": 8, "event": "llm_turn", "ts": "2026-08-16T15:42:27.015460+00:00", "content": null, "tool_calls": ["type_letters"]}
+{"step": 33, "event": "tool_call", "ts": "2026-08-16T15:42:27.338649+00:00", "tool": "type_letters", "args": {"letters": "bipod"}, "ok": true, "message": "typed 5 chars"}
+{"step": 9, "event": "llm_turn", "ts": "2026-08-16T15:42:46.170959+00:00", "content": null, "tool_calls": ["press_key"]}
+{"step": 35, "event": "tool_call", "ts": "2026-08-16T15:42:46.175595+00:00", "tool": "press_key", "args": {"key": "Enter"}, "ok": true, "message": "pressed key 'Enter'"}
+{"step": 36, "event": "guess_feedback_captured", "ts": "2026-08-16T15:42:46.186356+00:00", "guess": "bipod", "feedback": ["absent", "correct", "absent", "elsewhere", "elsewhere"]}
+{"step": 37, "event": "dead_end", "ts": "2026-08-16T15:42:46.219218+00:00", "reason": "dead end: reached max_steps=9 or timeout_s=600 without finishing"}
+{"step": 38, "event": "escalation_requested", "ts": "2026-08-16T15:42:46.252429+00:00", "reason": "dead end: reached max_steps=9 or timeout_s=600 without finishing", "capability_id": "discovery", "step_id": null, "url": "https://hellowordl.net/", "requested_at": "2026-08-16T15:42:46.251601+00:00"}
+{"step": 39, "event": "waiting_for_human_resume", "ts": "2026-08-16T15:42:46.252556+00:00"}
+{"step": 40, "event": "control_resumed_to_automation", "ts": "2026-08-16T15:45:28.291383+00:00", "human_action_count": 2}
+{"step": 41, "event": "human_resumed", "ts": "2026-08-16T15:45:28.291899+00:00", "human_action_count": 2}
+{"step": 42, "event": "guess_history_resynced", "ts": "2026-08-16T15:45:28.353551+00:00", "rows": 4}
+{"step": 10, "event": "llm_turn", "ts": "2026-08-16T15:45:33.078351+00:00", "content": null, "tool_calls": ["propose_next_words"]}
+{"step": 44, "event": "tool_call", "ts": "2026-08-16T15:45:33.099770+00:00", "tool": "propose_next_words", "args": {}, "ok": true, "message": "1 candidates remain"}
+{"step": 11, "event": "llm_turn", "ts": "2026-08-16T15:45:38.962090+00:00", "content": null, "tool_calls": ["type_letters"]}
+{"step": 46, "event": "tool_call", "ts": "2026-08-16T15:45:39.284756+00:00", "tool": "type_letters", "args": {"letters": "ditto"}, "ok": true, "message": "typed 5 chars"}
+{"step": 12, "event": "llm_turn", "ts": "2026-08-16T15:46:34.110117+00:00", "content": null, "tool_calls": ["press_key"]}
+{"step": 48, "event": "tool_call", "ts": "2026-08-16T15:46:34.115347+00:00", "tool": "press_key", "args": {"key": "Enter"}, "ok": true, "message": "pressed key 'Enter'"}
+{"step": 49, "event": "guess_feedback_captured", "ts": "2026-08-16T15:46:34.124954+00:00", "guess": "ditto", "feedback": ["correct", "correct", "correct", "correct", "correct"]}
+{"step": 50, "event": "dead_end", "ts": "2026-08-16T15:46:34.153370+00:00", "reason": "dead end: reached max_steps=12 or timeout_s=600 without finishing"}
+{"step": 51, "event": "escalation_requested", "ts": "2026-08-16T15:46:34.185398+00:00", "reason": "dead end: reached max_steps=12 or timeout_s=600 without finishing", "capability_id": "discovery", "step_id": null, "url": "https://hellowordl.net/", "requested_at": "2026-08-16T15:46:34.184940+00:00"}
+{"step": 52, "event": "waiting_for_human_resume", "ts": "2026-08-16T15:46:34.185498+00:00"}
+{"step": 53, "event": "control_resumed_to_automation", "ts": "2026-08-16T15:48:37.052700+00:00", "human_action_count": 2}
+{"step": 54, "event": "human_resumed", "ts": "2026-08-16T15:48:37.054110+00:00", "human_action_count": 2}
+{"step": 55, "event": "guess_history_resynced", "ts": "2026-08-16T15:48:37.095194+00:00", "rows": 5}
+{"step": 13, "event": "llm_turn", "ts": "2026-08-16T15:48:43.031780+00:00", "content": null, "tool_calls": ["finish_goal"]}
+{"step": 57, "event": "tool_call", "ts": "2026-08-16T15:48:43.032227+00:00", "tool": "finish_goal", "args": {"outcome": "won", "summary": "Guessed the correct word 'DITTO' in 5 attempts and won the game."}, "ok": true, "message": "Guessed the correct word 'DITTO' in 5 attempts and won the game."}
+{"step": 58, "event": "discovery_end", "ts": "2026-08-16T15:48:43.032544+00:00", "finished": true, "finish_result": {"outcome": "won", "summary": "Guessed the correct word 'DITTO' in 5 attempts and won the game."}, "escalated": false, "escalate_reason": null, "steps_used": 13}
+{"step": 59, "event": "artifact_saved", "ts": "2026-08-16T15:48:43.035638+00:00", "path": "/Users/pruthvi/Desktop/InterfaceAI/artifacts/submit_guess.v1.0.0.json"}
